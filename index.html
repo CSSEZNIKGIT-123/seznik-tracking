@@ -702,6 +702,9 @@ async function seznikTrack(e) {
     return;
   }
 
+  // update URL to /track/{awb}
+  window.history.pushState(null, "", "/track/" + encodeURIComponent(awb));
+
   button.disabled = true;
   button.textContent = "Checking...";
 
