@@ -49,11 +49,21 @@ export default function TrackingApp({ initialAwb = "" }) {
       // Wait only for the remaining animation time
       await animationDelay;
 
+      
+      // Expired tracking link
+      if (d.expired === true) {
+        setData(d);
+        setStatus("expired");
+        return;
+      }
+
+      // Invalid tracking number
       if (!d.found) {
         setMessage(d.message || "No shipment found.");
         setStatus("notfound");
         return;
       }
+
 
       setData(d);
       setStatus("ok");
@@ -190,6 +200,10 @@ export default function TrackingApp({ initialAwb = "" }) {
                 </p>
               )}
 
+              {status === "expired" && data && (
+                <ExpiredTracking d={data} />
+              )}
+              
               {status === "ok" && data && (
                 <Result d={data} />
               )}
@@ -245,6 +259,7 @@ export default function TrackingApp({ initialAwb = "" }) {
    SHIPMENT RESULT COMPONENT
    ====================================== */
 
+
 function Result({ d }) {
 
   /* Shipment Exception */
@@ -265,8 +280,12 @@ function Result({ d }) {
 
   const isDelivered = stage === 4;
 
-  /* Product Image */
-  const img = productImage(d.product);
+  /* Product Image or Gift Box */
+  const isGift =
+    d.is_gift === true ||
+    String(d.product || "").toLowerCase().includes("gift");
+
+  const img = isGift ? null : productImage(d.product);
 
   /* Timeline Progress */
   const progress = ((stage - 1) / 3) * 100;
@@ -399,17 +418,21 @@ function Result({ d }) {
 
                 <div
                   className={`dot ${
-                    isCurrent && img ? "has-product" : ""
+                    isCurrent ? "has-product" : ""
                   }`}
                 >
 
-                  {/* Product appears only on current stage */}
-                  {isCurrent && img && (
-                    <img
-                      className="stage-product"
-                      src={img}
-                      alt={d.product || "Shipment product"}
-                    />
+                  {/* Product image or animated gift box */}
+                  {isCurrent && (
+                    img ? (
+                      <img
+                        className="stage-product"
+                        src={img}
+                        alt={d.product || "Shipment product"}
+                      />
+                    ) : (
+                      <GiftBox />
+                    )
                   )}
 
                 </div>
@@ -589,6 +612,202 @@ function TruckLoader() {
         <span />
         <span />
         <span />
+      </div>
+
+    </div>
+  );
+}
+
+
+
+function GiftBox() {
+  return (
+    <svg
+      className="animated-gift-box"
+      viewBox="0 0 80 80"
+      aria-hidden="true"
+    >
+      <g className="gift-body">
+
+        {/* Gift box body */}
+        <rect
+          x="16"
+          y="34"
+          width="48"
+          height="36"
+          rx="5"
+          fill="#2563eb"
+        />
+
+        {/* Golden ribbon */}
+        <rect
+          x="35"
+          y="34"
+          width="10"
+          height="36"
+          fill="#fbbf24"
+        />
+
+        {/* Moving lid */}
+        <g className="gift-lid">
+
+          <rect
+            x="12"
+            y="25"
+            width="56"
+            height="13"
+            rx="4"
+            fill="#60a5fa"
+          />
+
+          <rect
+            x="35"
+            y="25"
+            width="10"
+            height="13"
+            fill="#fcd34d"
+          />
+
+          {/* Ribbon bow */}
+          <path
+            d="M40 25C8 25 23 0 40 25M40 25C72 25 57 0 40 25"
+            fill="none"
+            stroke="#f59e0b"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+
+        </g>
+      </g>
+
+      {/* Sparkles */}
+      <path
+        className="gift-sparkles"
+        d="M9 8V20M3 14H15M69 3V15M63 9H75"
+        stroke="#fbbf24"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+
+/* =========================================
+   EXPIRED TRACKING / CLOSED CASE
+   ========================================= */
+
+function ExpiredTracking({ d }) {
+
+  const isPickup =
+    String(d.shipment_type || "").toLowerCase() === "pickup";
+
+  const normalizedStatus = String(d.issue_status || "")
+    .toLowerCase()
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const isConfirmed =
+    normalizedStatus === "closed customer confirmed";
+
+  const closureMessage = isConfirmed
+    ? isPickup
+      ? "This case has been closed as the customer has confirmed that the package was successfully collected."
+      : "This case has been closed as the customer has confirmed that the package was successfully delivered."
+    : d.message ||
+      "This case has been closed and the tracking link is no longer active.";
+
+  const whatsappMessage = encodeURIComponent(
+    `Hello Seznik Support, I have a query regarding my shipment.${
+      d.case_id ? ` Case ID: ${d.case_id}.` : ""
+    }`
+  );
+
+  const whatsappLink =
+    `https://wa.me/918237869618?text=${whatsappMessage}`;
+
+  return (
+    <div className="expired-tracking">
+
+      {/* Case Closure Banner */}
+      <div className="delivered-banner expired-banner">
+
+        <div className="delivered-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12l4 4L19 6" />
+          </svg>
+        </div>
+
+        <div className="delivered-content">
+
+          <h3>Case Successfully Closed</h3>
+
+          <p>{closureMessage}</p>
+
+          <p className="expired-note">
+            This tracking link is no longer active.
+          </p>
+
+        </div>
+
+        <span className="delivered-badge">
+          Closed
+        </span>
+
+      </div>
+
+      {/* Case Reference */}
+      {d.case_id && (
+        <div className="expired-case-id">
+          Case ID: <strong>{d.case_id}</strong>
+        </div>
+      )}
+
+      {/* Customer Support */}
+      <div className="expired-support">
+
+        <h3>Need further assistance?</h3>
+
+        <p>
+          If you have any queries or inquiries regarding
+          your shipment, please contact us on WhatsApp.
+        </p>
+
+        <a
+          className="expired-whatsapp"
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12 2a9.8 9.8 0 0 0-8.5 14.7L2 22l5.5-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.4-.2-3.2.8.9-3.1-.2-.4A8 8 0 1 1 12 20z"/>
+            <path d="M9 7c-.2-.5-.4-.5-.7-.5h-.6c-.2 0-.6.1-.9.5-.3.3-1 1-1 2.4s1 2.8 1.2 3c.2.2 2 3.1 5 4.2 2.5 1 3 .6 3.6.6.6-.1 1.8-.8 2-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.6-.4l-2.1-1c-.3-.1-.5-.2-.7.2l-1 1.1c-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5.3-.5c.1-.2 0-.4 0-.6L9 7z"/>
+          </svg>
+
+          <span>+91 82378 69618</span>
+
+          <span aria-hidden="true">↗</span>
+
+        </a>
+
+        <span className="expired-support-caption">
+          Click to chat with our support team
+        </span>
+
       </div>
 
     </div>

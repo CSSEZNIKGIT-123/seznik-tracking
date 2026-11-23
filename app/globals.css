@@ -1472,3 +1472,287 @@ select {
     animation: none;
   }
 }
+
+
+/* =========================================
+   ANIMATED GIFT BOX - PRODUCT FALLBACK
+   ========================================= */
+
+.animated-gift-box {
+  display: block;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Gentle gift box movement */
+
+.gift-body {
+  transform-origin: center;
+  animation: gift-bounce 2s ease-in-out infinite;
+}
+
+@keyframes gift-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Moving gift lid */
+
+.gift-lid {
+  transform-origin: 40px 34px;
+  animation: gift-lid-movement 2s ease-in-out infinite;
+}
+
+@keyframes gift-lid-movement {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  40%, 60% {
+    transform: translateY(-4px) rotate(-5deg);
+  }
+}
+
+/* Sparkling stars */
+
+.gift-sparkles {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gift-sparkle 2s ease-in-out infinite;
+}
+
+@keyframes gift-sparkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.5);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+  .animated-gift-box {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 360px) {
+  .animated-gift-box {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-body,
+  .gift-lid,
+  .gift-sparkles {
+    animation: none;
+  }
+}
+
+
+/* =========================================
+   EXPIRED TRACKING / CLOSED CASE
+   ========================================= */
+
+.expired-tracking {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 24px;
+  animation: expired-fade-in 0.35s ease-out;
+}
+
+@keyframes expired-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reuse the delivered confirmation design */
+
+.expired-banner {
+  align-items: flex-start;
+}
+
+.expired-banner .delivered-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.expired-banner .delivered-content p {
+  line-height: 1.7;
+}
+
+.expired-note {
+  margin-top: 10px !important;
+  font-size: 12px !important;
+  opacity: 0.8;
+}
+
+/* Case ID */
+
+.expired-case-id {
+  margin-top: 14px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.expired-case-id strong {
+  color: #334155;
+  font-weight: 600;
+}
+
+/* Customer support section */
+
+.expired-support {
+  margin-top: 24px;
+  padding: 24px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.expired-support h3 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.expired-support p {
+  max-width: 420px;
+  margin: 0 auto 20px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* WhatsApp button */
+
+.expired-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: #16a34a;
+  color: #ffffff !important;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.expired-whatsapp svg {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+}
+
+.expired-whatsapp:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
+}
+
+.expired-whatsapp:active {
+  transform: scale(0.98);
+}
+
+.expired-whatsapp:focus-visible {
+  outline: 3px solid #86efac;
+  outline-offset: 3px;
+}
+
+.expired-support-caption {
+  display: block;
+  margin-top: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+
+  .expired-tracking {
+    margin-top: 20px;
+  }
+
+  .expired-banner {
+    padding: 16px 12px;
+    gap: 12px;
+  }
+
+  .expired-banner .delivered-badge {
+    display: none;
+  }
+
+  .expired-banner h3 {
+    font-size: 15px;
+  }
+
+  .expired-banner .delivered-content p {
+    font-size: 12px;
+  }
+
+  .expired-support {
+    padding: 20px 14px;
+    margin-top: 20px;
+  }
+
+  .expired-support h3 {
+    font-size: 16px;
+  }
+
+  .expired-support p {
+    font-size: 13px;
+  }
+
+  .expired-whatsapp {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 48px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .expired-tracking {
+    animation: none;
+  }
+
+  .expired-whatsapp {
+    transition: none;
+  }
+}
