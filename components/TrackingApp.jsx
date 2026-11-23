@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { productImage } from "../lib/productImages";
 
-const WORKER_URL = "https://track.seznik.in";
+const WORKER_URL = "https://seznik-tracking-proxy.cs-seznik.workers.dev";
 const STAGES = ["Order Confirmed", "In Transit", "Out for Delivery", "Delivered"];
 
 export default function TrackingApp({ initialAwb = "" }) {
@@ -27,6 +27,7 @@ export default function TrackingApp({ initialAwb = "" }) {
       setData(d);
       setStatus("ok");
     } catch (e) {
+      console.error("Tracking API error:", e);
       setStatus("error");
     }
   }, []);
@@ -78,6 +79,8 @@ export default function TrackingApp({ initialAwb = "" }) {
             <h2 className="card-heading">Where is your order?</h2>
             <form className="tracking-form" onSubmit={onSubmit}>
               <input
+                id="awb"
+                name="awb"
                 className="tracking-input"
                 type="text"
                 value={awb}
