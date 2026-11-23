@@ -19,6 +19,90 @@ export default function TrackingApp({ initialAwb = "" }) {
   const [data, setData] = useState(null);
   const [message, setMessage] = useState("");
 
+  /* Dynamic WhatsApp Support Message */
+
+  const getWhatsAppLink = () => {
+    const phone = "918237869618";
+
+    const shipment = status === "ok" ? data : null;
+
+    const issueStatus = String(
+      shipment?.issue_status || ""
+    ).trim();
+
+    const normalizedStatus = (
+      issueStatus + " " + (shipment?.stage_label || "")
+    )
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+
+    const isDelayed = normalizedStatus.includes("delay");
+    const isCancelled = normalizedStatus.includes("cancel");
+
+    const isPickup =
+      normalizedStatus.includes("pickup") ||
+      normalizedStatus.includes("pick up");
+
+    const isDispatch =
+      normalizedStatus.includes("dispatch");
+
+    let issueMessage = "";
+
+    if (isCancelled && isPickup) {
+      issueMessage = "My shipment pickup has been cancelled.";
+    } else if (isCancelled && isDispatch) {
+      issueMessage = "My shipment dispatch has been cancelled.";
+    } else if (isDelayed && isPickup) {
+      issueMessage = "My shipment pickup has been delayed.";
+    } else if (isDelayed && isDispatch) {
+      issueMessage = "My shipment dispatch has been delayed.";
+    } else if (isCancelled) {
+      issueMessage = "My shipment has been cancelled.";
+    } else if (isDelayed) {
+      issueMessage = "My shipment has been delayed.";
+    } else if (Number(shipment?.stage) === 4) {
+      issueMessage =
+        "I need assistance regarding my delivered shipment.";
+    } else if (Number(shipment?.stage) === 2) {
+      issueMessage =
+        "I would like an update on my shipment in transit.";
+    }
+
+    const details = [
+      shipment?.case_id
+        ? `Case ID: ${shipment.case_id}`
+        : "",
+
+      shipment?.tracking_id
+        ? `Tracking Number: ${shipment.tracking_id}`
+        : "",
+
+      shipment?.product
+        ? `Product: ${shipment.product}`
+        : "",
+
+      issueStatus
+        ? `Status: ${issueStatus}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const text = [
+      "Hello Seznik Support,",
+      "I need help with my shipment.",
+      details,
+      issueMessage,
+      "Kindly assist me and provide an update.",
+      "Thank you.",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  };
+
   
   const track = useCallback(async (value) => {
     const n = (value || "").trim();
@@ -126,24 +210,9 @@ export default function TrackingApp({ initialAwb = "" }) {
 
           {/* Hero Section */}
           <section className="hero">
-            <div className="hero-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 7h11v12H3z" />
-                <path d="M14 11h4l3 3v5h-7z" />
-                <circle cx="7.5" cy="19" r="2" />
-                <circle cx="17.5" cy="19" r="2" />
-                <path d="M3 10h8" />
-              </svg>
-            </div>
-
-            <h1>Track Your Order</h1>
+            <HeroTruck />
+            <div className="hero-eyebrow">SEAMLESS SHIPMENT TRACKING</div>
+            <h1>Track Your <span>Order</span></h1>
 
             <p>
               Your order is on its way! Enter your tracking
@@ -153,9 +222,13 @@ export default function TrackingApp({ initialAwb = "" }) {
 
           {/* Tracking Form */}
           <section className="tracking-card">
-            <h2 className="card-heading">
-              Where is your order?
-            </h2>
+            <div className="tracking-card-header">
+              <div className="package-icon"><SupportIcon type="package" /></div>
+              <div>
+                <h2 className="card-heading">Where is your order?</h2>
+                <p className="card-description">Enter your shipment tracking number below.</p>
+              </div>
+            </div>
 
             <form
               className="tracking-form"
@@ -168,7 +241,7 @@ export default function TrackingApp({ initialAwb = "" }) {
                 type="text"
                 value={awb}
                 onChange={(e) => setAwb(e.target.value)}
-                placeholder="Enter your tracking number"
+                placeholder="Enter your AWB / tracking number"
                 aria-label="Tracking number"
                 autoComplete="off"
                 maxLength={100}
@@ -213,7 +286,7 @@ export default function TrackingApp({ initialAwb = "" }) {
 
           {/* Customer Support */}
           <section className="support-section">
-            <h2>Need Help With Your Order?</h2>
+            <h2>We’re here to help.</h2>
 
             <p>
               Our support team is here to help you.
@@ -226,22 +299,26 @@ export default function TrackingApp({ initialAwb = "" }) {
                 href="tel:+918237869618"
                 className="support-btn"
               >
+                <SupportIcon type="phone" />
                 Call Us
               </a>
 
               <a
-                href="https://wa.me/918237869618"
+                href={getWhatsAppLink()}
                 className="support-btn"
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <SupportIcon type="whatsapp" />
                 WhatsApp
               </a>
+
 
               <a
                 href="mailto:support@seznik.in"
                 className="support-btn"
               >
+                <SupportIcon type="email" />
                 Email Support
               </a>
             </div>
@@ -250,7 +327,6 @@ export default function TrackingApp({ initialAwb = "" }) {
         </div>
       </main>
 
-      {/* Footer */}
     </>
   );
 }
@@ -811,5 +887,46 @@ function ExpiredTracking({ d }) {
       </div>
 
     </div>
+  );
+}
+
+function HeroTruck() {
+  return (
+    <div className="hero-truck" aria-hidden="true">
+      <svg viewBox="0 0 260 120" fill="none">
+        <ellipse cx="130" cy="104" rx="91" ry="6" fill="#cfdef0" />
+        <g className="hero-truck-speed" stroke="#9bbef1" strokeWidth="3" strokeLinecap="round">
+          <path d="M12 38H40M3 52H32M18 66H40" />
+        </g>
+        <g className="hero-truck-body">
+          <rect x="42" y="15" width="119" height="66" rx="9" fill="white" stroke="#c5d9f4" strokeWidth="2" />
+          <rect x="42" y="15" width="119" height="8" rx="4" fill="#2264dc" />
+          <path d="M161 39H190L213 62V83H161Z" fill="#2463db" />
+          <path d="M169 45H187L202 62H169Z" fill="#c4e7ff" />
+          <rect x="38" y="77" width="178" height="10" rx="4" fill="#15366a" />
+          <rect x="208" y="69" width="7" height="7" rx="2" fill="#fbbf24" />
+          <image href="https://seznik.in/cdn/shop/files/SEZNIK_LOGO-rec.webp?v=1786822463&amp;width=250" x="52" y="31" width="99" height="34" preserveAspectRatio="xMidYMid meet" />
+          {[72, 186].map((x) => (
+            <g key={x} className="hero-truck-wheel">
+              <circle cx={x} cy="86" r="14" fill="#1e293b" />
+              <circle cx={x} cy="86" r="7" fill="#cbd5e1" />
+              <path d={`M${x} 80V92M${x-6} 86H${x+6}`} stroke="#64748b" strokeWidth="2" />
+            </g>
+          ))}
+        </g>
+      </svg>
+      <div className="hero-truck-road" />
+    </div>
+  );
+}
+
+function SupportIcon({ type }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {type === "package" && <path d="M3 7L12 2L21 7V17L12 22L3 17Z M3 7L12 12L21 7M12 12V22M7.5 4.5L16.5 9.5" />}
+      {type === "phone" && <path d="M5 3H9L11 8L8 11Q10 15 14 17L17 14L22 16V20Q22 23 18 22Q3 18 2 6Q2 3 5 3Z" />}
+      {type === "whatsapp" && <><path d="M3 21L4.5 16.5A9 9 0 1 1 8 20Z" /><path d="M8 7Q5 12 14 16Q17 17 17 13L14 12L12 14Q9 12 10 10Z" fill="currentColor" stroke="none" /></>}
+      {type === "email" && <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M2 6L12 13L22 6" /></>}
+    </svg>
   );
 }
