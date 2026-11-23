@@ -1,3 +1,4 @@
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 export const metadata = {
@@ -8,7 +9,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.variable}>
+        {children}
+      </body>
     </html>
   );
 }
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});

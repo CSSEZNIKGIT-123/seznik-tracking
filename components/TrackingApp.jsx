@@ -220,17 +220,6 @@ export default function TrackingApp({ initialAwb = "" }) {
       </main>
 
       {/* Footer */}
-      <footer className="footer">
-        <a
-          href="https://seznik.in"
-          aria-label="Seznik home"
-        >
-          <img
-            src="https://seznik.in/cdn/shop/files/SEZNIK_LOGO-rec.webp?v=1786822463&width=250"
-            alt="Seznik"
-          />
-        </a>
-      </footer>
     </>
   );
 }
