@@ -19,23 +19,35 @@ export default function TrackingApp({ initialAwb = "" }) {
   const [data, setData] = useState(null);
   const [message, setMessage] = useState("");
 
+  
   const track = useCallback(async (value) => {
     const n = (value || "").trim();
 
     if (!n) return;
 
     setStatus("loading");
+    setData(null);
+    setMessage("");
+
+    // Start the 2-second timer immediately
+    const animationDelay = new Promise((resolve) =>
+      setTimeout(resolve, 2000)
+    );
 
     try {
+      // Fetch shipment details immediately
       const res = await fetch(
-        WORKER_URL + "?awb=" + encodeURIComponent(n)
+        `${WORKER_URL}/?awb=${encodeURIComponent(n)}`
       );
 
       if (!res.ok) {
-        throw new Error(`Tracking API returned ${res.status}`);
+        throw new Error(`API returned ${res.status}`);
       }
 
       const d = await res.json();
+
+      // Wait only for the remaining animation time
+      await animationDelay;
 
       if (!d.found) {
         setMessage(d.message || "No shipment found.");
@@ -45,11 +57,20 @@ export default function TrackingApp({ initialAwb = "" }) {
 
       setData(d);
       setStatus("ok");
-    } catch (e) {
-      console.error("Tracking API error:", e);
+
+    } catch (error) {
+      await animationDelay;
+
+      console.error("Tracking API error:", error);
+
+      setMessage(
+        "Unable to fetch shipment details. Please try again."
+      );
+
       setStatus("error");
     }
   }, []);
+
 
   useEffect(() => {
     if (initialAwb) track(initialAwb);
