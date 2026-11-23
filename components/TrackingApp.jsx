@@ -157,11 +157,7 @@ export default function TrackingApp({ initialAwb = "" }) {
             {/* Tracking Result */}
             <div className="result" aria-live="polite">
 
-              {status === "loading" && (
-                <p className="message">
-                  Checking your shipment details...
-                </p>
-              )}
+              {status === "loading" && <TruckLoader />}
 
               {status === "notfound" && (
                 <p className="message">{message}</p>
@@ -428,5 +424,152 @@ function Result({ d }) {
       {courier}
 
     </>
+  );
+}
+
+
+/* ======================================
+   ANIMATED TRUCK LOADER
+   ====================================== */
+
+function TruckLoader() {
+  return (
+    <div className="truck-loader" role="status">
+
+      <div className="truck-animation" aria-hidden="true">
+
+        {/* Moving speed lines */}
+        <div className="truck-speed-lines">
+          <span />
+          <span />
+          <span />
+        </div>
+
+        {/* Animated road */}
+        <div className="truck-road" />
+
+        {/* Delivery truck */}
+        <svg
+          className="loading-truck"
+          viewBox="0 0 140 90"
+          fill="none"
+        >
+          {/* Truck container */}
+          <rect
+            x="5"
+            y="7"
+            width="84"
+            height="57"
+            rx="7"
+            fill="#1463ed"
+          />
+
+          {/* Truck cabin */}
+          <path
+            d="M89 24H110Q115 24 118 29L133 48V64H89Z"
+            fill="#2563eb"
+          />
+
+          {/* Cabin window */}
+          <path
+            d="M98 31H110L122 47H98Z"
+            fill="#dbeafe"
+          />
+
+          {/* Truck chassis */}
+          <rect
+            x="4"
+            y="60"
+            width="131"
+            height="8"
+            rx="3"
+            fill="#1e3a8a"
+          />
+
+          {/* Seznik branding */}
+          <text
+            x="47"
+            y="40"
+            textAnchor="middle"
+            fill="#ffffff"
+            fontSize="16"
+            fontWeight="800"
+            letterSpacing="1"
+          >
+            SEZNIK
+          </text>
+
+          {/* Rear wheel */}
+          <g className="truck-wheel">
+            <circle
+              cx="30"
+              cy="68"
+              r="13"
+              fill="#1e293b"
+            />
+            <circle
+              cx="30"
+              cy="68"
+              r="6"
+              fill="#cbd5e1"
+            />
+            <path
+              d="M30 63V73M25 68H35"
+              stroke="#64748b"
+              strokeWidth="2"
+            />
+          </g>
+
+          {/* Front wheel */}
+          <g className="truck-wheel">
+            <circle
+              cx="110"
+              cy="68"
+              r="13"
+              fill="#1e293b"
+            />
+            <circle
+              cx="110"
+              cy="68"
+              r="6"
+              fill="#cbd5e1"
+            />
+            <path
+              d="M110 63V73M105 68H115"
+              stroke="#64748b"
+              strokeWidth="2"
+            />
+          </g>
+
+          {/* Headlight */}
+          <rect
+            x="127"
+            y="51"
+            width="8"
+            height="5"
+            rx="2"
+            fill="#fbbf24"
+          />
+
+        </svg>
+      </div>
+
+      {/* Loading message */}
+      <h3 className="truck-loader-title">
+        Locating your shipment...
+      </h3>
+
+      <p className="truck-loader-description">
+        Fetching the latest tracking updates.
+      </p>
+
+      {/* Animated loading dots */}
+      <div className="truck-loading-dots" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+
+    </div>
   );
 }
