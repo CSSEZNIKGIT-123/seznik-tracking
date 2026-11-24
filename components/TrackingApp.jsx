@@ -82,7 +82,7 @@ export default function TrackingApp({ initialAwb = "" }) {
         ? `Product: ${shipment.product}`
         : "",
 
-      issueStatus
+      (isDelayed || isCancelled) && issueStatus
         ? `Status: ${issueStatus}`
         : "",
     ]
