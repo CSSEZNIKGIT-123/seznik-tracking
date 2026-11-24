@@ -128,11 +128,21 @@ export default function TrackingApp({ initialAwb = "" }) {
         throw new Error(`API returned ${res.status}`);
       }
 
+      
       const d = await res.json();
-
+      
       // Wait only for the remaining animation time
       await animationDelay;
-
+      
+      // Backend API error
+      if (d.api_error === true) {
+        setMessage(
+          d.message ||
+          "We are temporarily unable to retrieve your shipment details. Please try again later."
+        );
+        setStatus("error");
+        return;
+      }
       
       // Expired tracking link
       if (d.expired === true) {
@@ -140,15 +150,18 @@ export default function TrackingApp({ initialAwb = "" }) {
         setStatus("expired");
         return;
       }
-
+      
       // Invalid tracking number
       if (!d.found) {
-        setMessage(d.message || "No shipment found.");
+        setMessage(
+          d.message ||
+          "No shipment found for this tracking number."
+        );
         setStatus("notfound");
         return;
       }
-
-
+      
+      // Valid shipment
       setData(d);
       setStatus("ok");
 
