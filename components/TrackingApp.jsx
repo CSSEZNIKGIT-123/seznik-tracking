@@ -282,7 +282,7 @@ export default function TrackingApp({ initialAwb = "" }) {
 
               {status === "error" && (
                 <p className="message">
-                  Something went wrong. Please try again.
+                  {message || "Something went wrong. Please try again."}
                 </p>
               )}
 
