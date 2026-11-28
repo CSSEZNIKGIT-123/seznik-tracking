@@ -4,6 +4,8 @@ Customer order-tracking page for the Seznik website. Rebuilt from the static
 version as a React (Next.js) app with the same design and behaviour. The backend
 (Cloudflare proxy Worker + Zoho Deluge function) is unchanged.
 
+**Status:** Live at **https://track.seznik.in**
+
 ## How it works
 
 Customer → this site (Next.js on Vercel) → `seznik-tracking-proxy` (Cloudflare
